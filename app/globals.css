@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@theme {
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 75rem;
+
+  --font-sans: var(--font-league-spartan), ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: #111111;
+  --color-slate-ink: #242b37;
+  --color-slate-mist: #5c6779;
+  --color-tab: #4c4c4c;
+  --color-tab-muted: #767676;
+  --color-rule: #8e8e8e;
+  --color-placeholder: #707070;
+  --color-beige: #9e7f66;
+  --color-error: #b54949;
+
+  --shadow-photo: 0 75px 100px -50px rgb(56 66 85 / 0.5);
+  --shadow-menu: 0 15px 25px rgb(56 66 85 / 0.25);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: #ffffff;
+    color: var(--color-slate-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-beige);
+    outline-offset: 4px;
+  }
+
+  input::placeholder {
+    color: var(--color-placeholder);
+    opacity: 1;
+  }
+}
+
+/* Unlayered so it beats display utilities: scripted pages hide no-JS notes, unscripted pages hide JS-only controls. */
+html.js [data-no-js],
+html:not(.js) [data-js-only] {
+  display: none;
+}
+
+@utility text-hero {
+  font-weight: 300;
+  font-size: 2rem;
+  line-height: 2.5rem;
+  letter-spacing: -0.025rem;
+
+  @variant md {
+    font-size: 3rem;
+    line-height: 4rem;
+    letter-spacing: -0.0375rem;
+  }
+}
+
+@utility text-section-title {
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 2.5rem;
+  letter-spacing: -0.025rem;
+
+  @variant md {
+    font-size: 3rem;
+    line-height: 3rem;
+    letter-spacing: -0.03125rem;
+  }
+}
+
+@utility text-body {
+  font-size: 1rem;
+  line-height: 1.625rem;
+
+  @variant md {
+    font-size: 1.25rem;
+    line-height: 1.875rem;
+  }
+}
+
+@utility text-button {
+  font-weight: 600;
+  font-size: 1.0625rem;
+  line-height: 1rem;
+  letter-spacing: 0.15625rem;
+  text-transform: uppercase;
+}
+
+@utility text-footer {
+  font-size: 0.875rem;
+  line-height: 1.75rem;
+  letter-spacing: 0.125rem;
+  text-transform: uppercase;
+}
+
+@utility text-field {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
