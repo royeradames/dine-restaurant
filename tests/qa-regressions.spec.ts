@@ -93,7 +93,9 @@ for (const path of ["/", "/booking"]) {
   });
 }
 
-test("the booking card never overlaps the reservation header text", async ({ page }) => {
+// The card sits over the decorative photo by design. The sweep's overlap finding came from the photo
+// living inside <header>; with the photo moved behind both, header and card share no ink at any width.
+test("the booking card overlaps only the decorative photo, never the header", async ({ page }) => {
   for (const width of [320, 375, 768, 1024, 1440, 1920]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/booking");

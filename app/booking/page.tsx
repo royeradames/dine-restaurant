@@ -22,7 +22,7 @@ const headerPhoto = photo("hero-bg", { mobile: [375, 600], tablet: [768, 600], d
 export default function BookingPage() {
   return (
     <>
-      {/* The photo sits behind both the header and the top of main, so the booking card overlaps the photo, not the header's text. */}
+      {/* The photo sits behind both the header and the top of main: the booking card overlaps only this decorative photo, never the header. */}
       <div className="relative isolate">
         <ArtPicture sources={headerPhoto} alt="" priority className="absolute inset-x-0 top-0 -z-10 h-[600px] bg-ink" />
         <header className="h-[600px] px-6 pt-14 text-center text-white md:px-10 lg:px-0 lg:pt-[65px] lg:text-left">
