@@ -15,12 +15,12 @@ import { buttonBaseClasses } from "./button-link";
 import { PeopleCounter } from "./people-counter";
 import { PeriodSelect } from "./period-select";
 
-const submitClasses = `${buttonBaseClasses} w-full cursor-pointer border-ink bg-ink text-white hover:bg-white hover:text-ink focus-visible:bg-white focus-visible:text-ink`;
+const submitClasses = `${buttonBaseClasses} w-full cursor-pointer px-4 border-ink bg-ink text-white hover:bg-white hover:text-ink focus-visible:bg-white focus-visible:text-ink`;
 
 const underlineClasses = (invalid: boolean) =>
   `block w-full border-b bg-transparent text-ink caret-beige transition-[border-color,box-shadow] focus-visible:outline-none ${
     invalid
-      ? "border-error placeholder:text-error"
+      ? "border-error placeholder:text-error focus:shadow-[inset_0_-1px_0_var(--color-error)]"
       : "border-rule focus:border-ink focus:shadow-[inset_0_-1px_0_var(--color-ink)]"
   }`;
 
@@ -112,7 +112,6 @@ export function BookingForm() {
   return (
     <form
       noValidate
-      method="post"
       aria-label="Reserve a table"
       onSubmit={(event) => {
         event.preventDefault();
@@ -133,9 +132,9 @@ export function BookingForm() {
             <input
               id="booking-name"
               ref={bindInput("name")}
-              name="name"
               type="text"
               autoComplete="name"
+              aria-required="true"
               placeholder="Name"
               value={field.state.value}
               onChange={(event) => field.handleChange(event.target.value)}
@@ -162,9 +161,9 @@ export function BookingForm() {
             <input
               id="booking-email"
               ref={bindInput("email")}
-              name="email"
               type="email"
               autoComplete="email"
+              aria-required="true"
               placeholder="Email"
               value={field.state.value}
               onChange={(event) => field.handleChange(event.target.value)}
@@ -197,6 +196,7 @@ export function BookingForm() {
             </p>
           )}
         </div>
+        {/* The design marks the whole date row red for any date problem, so every part shares the error. */}
         <div className="mt-2 flex gap-1 md:contents">
           {(
             [
@@ -214,10 +214,10 @@ export function BookingForm() {
                   <input
                     id={`booking-${part.name}`}
                     ref={bindInput(part.name)}
-                    name={part.name}
                     type="text"
                     inputMode="numeric"
                     autoComplete="off"
+                    aria-required="true"
                     maxLength={part.maxLength}
                     placeholder={part.placeholder}
                     value={field.state.value}
@@ -265,10 +265,10 @@ export function BookingForm() {
                   <input
                     id={`booking-${part.name}`}
                     ref={bindInput(part.name)}
-                    name={part.name}
                     type="text"
                     inputMode="numeric"
                     autoComplete="off"
+                    aria-required="true"
                     maxLength={2}
                     placeholder={part.placeholder}
                     value={field.state.value}
@@ -293,6 +293,7 @@ export function BookingForm() {
                   onChange={(value) => field.handleChange(value)}
                   labelledBy="period-label"
                   invalid={Boolean(timeError)}
+                  describedBy={timeError ? "time-error" : undefined}
                 />
               </div>
             )}
@@ -308,9 +309,10 @@ export function BookingForm() {
         )}
       </form.Field>
 
-      <button type="submit" className={`${submitClasses} mt-8 md:mt-[33px]`}>
+      <button type="submit" data-js-only className={`${submitClasses} mt-8 md:mt-[33px]`}>
         Make reservation
       </button>
+      <p className="mt-4 text-center text-base leading-6 text-tab">Practice site: nothing you enter is sent.</p>
     </form>
   );
 }

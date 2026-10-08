@@ -39,14 +39,16 @@
     outline-offset: 4px;
   }
 
-  html.js [data-no-js] {
-    display: none;
-  }
-
   input::placeholder {
     color: var(--color-placeholder);
     opacity: 1;
   }
+}
+
+/* Unlayered so it beats display utilities: scripted pages hide no-JS notes, unscripted pages hide JS-only controls. */
+html.js [data-no-js],
+html:not(.js) [data-js-only] {
+  display: none;
 }
 
 @utility text-hero {

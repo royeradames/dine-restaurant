@@ -27,5 +27,5 @@ export const test = base.extend<{ pageProblems: string[] }>({
 
 export { expect };
 
-/** A fixed "now" so past-date rules are deterministic: Wednesday 7 October 2026, 10:00 local time. */
-export const FIXED_NOW = new Date(2026, 9, 7, 10, 0, 0);
+/** A fixed "now" so date rules are deterministic: Wednesday 7 October 2026, 10:00 at the restaurant (BST). */
+export const FIXED_NOW = new Date("2026-10-07T09:00:00Z");

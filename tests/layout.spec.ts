@@ -7,7 +7,7 @@ const pages = ["/", "/booking"] as const;
 const textSizes = (page: Page) =>
   page.evaluate(() => {
     const smallAllowed = (element: Element) =>
-      Boolean(element.closest("footer, [id$='-error'], #people-note"));
+      Boolean(element.closest("footer, [id$='-error']"));
     return [...document.querySelectorAll("body *")]
       .filter((element) => {
         if (element.closest("[hidden], noscript, script, style")) return false;
@@ -82,4 +82,24 @@ test("desktop booking decorations sit below the header, behind the overlapping f
   expect(boxes.band).toEqual([0, 600, 993, 320]);
   expect(boxes.lines).toEqual([655, 765]);
   expect(boxes.card).toEqual([735, 258, 540]);
+});
+
+test("button labels stay on one line at 400 px", async ({ page }) => {
+  await page.setViewportSize({ width: 400, height: 900 });
+  for (const path of ["/", "/booking"]) {
+    await page.goto(path);
+    const wrapped = await page.locator("a.text-button, button.text-button:not([role=tab])").evaluateAll((buttons) =>
+      buttons
+        .filter((button) => button.getClientRects().length > 0)
+        .filter((button) => {
+          const lines = new Set<number>();
+          const range = document.createRange();
+          range.selectNodeContents(button);
+          for (const rect of range.getClientRects()) if (rect.width > 0) lines.add(Math.round(rect.top));
+          return lines.size > 1;
+        })
+        .map((button) => button.textContent),
+    );
+    expect(wrapped, `wrapped buttons on ${path}`).toEqual([]);
+  }
 });

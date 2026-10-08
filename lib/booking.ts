@@ -6,6 +6,7 @@ export const bookingMessages = {
   incomplete: "This field is incomplete",
   invalidDate: "Please use a real date",
   pastDate: "Please pick today or a later date",
+  tooFarAhead: "We take bookings up to a year ahead",
   invalidTime: "Please use a valid time",
   pastTime: "Please pick a time later today",
 } as const;
@@ -53,12 +54,36 @@ const emailSchema = z.email();
 const firstEmpty = (values: BookingValues, fields: readonly BookingFieldName[]) =>
   fields.find((field) => values[field].trim() === "");
 
-const daysInMonth = (year: number, month: number) => new Date(year, month, 0).getDate();
+const daysInMonth = (year: number, month: number) => new Date(Date.UTC(year, month, 0)).getUTCDate();
 
-const startOfDay = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+/** The restaurant is in Sedbergh, so "today" and "now" are read on the UK clock, not the visitor's. */
+export const RESTAURANT_TIME_ZONE = "Europe/London";
+
+const restaurantClock = new Intl.DateTimeFormat("en-GB", {
+  timeZone: RESTAURANT_TIME_ZONE,
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+  hour: "numeric",
+  minute: "numeric",
+  hourCycle: "h23",
+});
+
+/**
+ * Wall-clock time at the restaurant, encoded as a UTC timestamp so it can be compared
+ * with booking times built the same way (Date.UTC of the guest's chosen fields).
+ */
+function restaurantWallClock(now: Date) {
+  const parts = Object.fromEntries(restaurantClock.formatToParts(now).map((part) => [part.type, Number(part.value)]));
+  return {
+    today: Date.UTC(parts.year, parts.month - 1, parts.day),
+    now: Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute),
+    oneYearAhead: Date.UTC(parts.year + 1, parts.month - 1, parts.day),
+  };
+}
 
 /** Returns the calendar day the guest picked, or the reason it is unusable. */
-function checkDate(values: BookingValues, now: Date): { date: Date } | { problem: Problem } {
+function checkDate(values: BookingValues, now: Date): { date: number } | { problem: Problem } {
   const empty = firstEmpty(values, ["month", "day", "year"]);
   if (empty) return { problem: { field: empty, message: bookingMessages.incomplete } };
 
@@ -73,13 +98,15 @@ function checkDate(values: BookingValues, now: Date): { date: Date } | { problem
     return { problem: { field: "day", message: bookingMessages.invalidDate } };
   }
 
-  const date = new Date(Number(year), Number(month) - 1, Number(day));
-  if (date < startOfDay(now)) return { problem: { field: "month", message: bookingMessages.pastDate } };
+  const date = Date.UTC(Number(year), Number(month) - 1, Number(day));
+  const clock = restaurantWallClock(now);
+  if (date < clock.today) return { problem: { field: "month", message: bookingMessages.pastDate } };
+  if (date > clock.oneYearAhead) return { problem: { field: "year", message: bookingMessages.tooFarAhead } };
   return { date };
 }
 
 /** Checks the 12-hour time, and that a booking for today is still ahead of now. */
-function checkTime(values: BookingValues, date: Date | undefined, now: Date): Problem | undefined {
+function checkTime(values: BookingValues, date: number | undefined, now: Date): Problem | undefined {
   const empty = firstEmpty(values, ["hour", "minute"]);
   if (empty) return { field: empty, message: bookingMessages.incomplete };
 
@@ -90,11 +117,11 @@ function checkTime(values: BookingValues, date: Date | undefined, now: Date): Pr
   if (!digits.test(minute) || Number(minute) > 59) {
     return { field: "minute", message: bookingMessages.invalidTime };
   }
-  if (!date) return undefined;
+  if (date === undefined) return undefined;
 
   const hour24 = (Number(hour) % 12) + (values.period === "PM" ? 12 : 0);
-  const bookingTime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour24, Number(minute));
-  if (bookingTime <= now) return { field: "hour", message: bookingMessages.pastTime };
+  const bookingTime = date + (hour24 * 60 + Number(minute)) * 60_000;
+  if (bookingTime <= restaurantWallClock(now).now) return { field: "hour", message: bookingMessages.pastTime };
   return undefined;
 }
 
@@ -146,10 +173,18 @@ export function validateBooking(values: BookingValues, now: Date = new Date()): 
 
 export const firstInvalidField = (errors: BookingErrors) => bookingFieldOrder.find((field) => errors[field]);
 
+const datePart = (date: Date, options: Intl.DateTimeFormatOptions) =>
+  new Intl.DateTimeFormat("en-GB", { timeZone: "UTC", ...options }).format(date);
+
 /** "Friday 15 October 2027 at 08:15 PM" for the demo confirmation. */
 export function describeBooking(values: BookingValues) {
-  const date = new Date(Number(values.year), Number(values.month) - 1, Number(values.day));
-  const day = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(date);
+  const date = new Date(Date.UTC(Number(values.year), Number(values.month) - 1, Number(values.day)));
+  const day = [
+    datePart(date, { weekday: "long" }),
+    datePart(date, { day: "numeric" }),
+    datePart(date, { month: "long" }),
+    datePart(date, { year: "numeric" }),
+  ].join(" ");
   const time = `${values.hour.trim().padStart(2, "0")}:${values.minute.trim().padStart(2, "0")} ${values.period}`;
   const party = values.people === 1 ? "1 person" : `${values.people} people`;
   return { day, time, party };

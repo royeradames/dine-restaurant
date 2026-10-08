@@ -49,6 +49,7 @@ test("booking page has its own title, heading and the designed controls", async 
   await expect(page.getByRole("group", { name: "Pick a date" }).getByRole("textbox")).toHaveCount(3);
   await expect(page.getByRole("group", { name: "Pick a time" }).getByRole("combobox", { name: "AM or PM" })).toHaveText("AM");
   await expect(page.getByRole("status")).toHaveText("4 people");
+  await expect(page.getByText("Practice site: nothing you enter is sent.")).toBeVisible();
 });
 
 test("an empty submit shows every required message inline and focuses the name", async ({ page }) => {
@@ -109,6 +110,8 @@ for (const { values, focus } of impossibleDates) {
 }
 
 test("accepts 29 February in a leap year", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2027-06-01T09:00:00Z"));
+  await page.goto("/booking");
   await fill(page, { ...valid, month: "02", day: "29", year: "2028" });
   await submit(page);
   await expect(page.getByRole("heading", { name: "Demo booking checked" })).toBeFocused();
@@ -130,6 +133,33 @@ test("rejects past dates and earlier times today", async ({ page }) => {
   await page.getByRole("option", { name: "PM" }).click();
   await expect(period).toHaveText("PM");
   await expect(field(page, "Hour")).not.toHaveAttribute("aria-invalid", "true");
+});
+
+test("rejects dates more than a year ahead", async ({ page }) => {
+  await fill(page, { ...valid, month: "10", day: "08", year: "2027" });
+  await submit(page);
+  await expect(field(page, "Year")).toBeFocused();
+  await expectError(page, "Year", "We take bookings up to a year ahead");
+  await fill(page, { day: "07" });
+  await expect(field(page, "Year")).not.toHaveAttribute("aria-invalid", "true");
+});
+
+test.describe("on the restaurant's clock", () => {
+  // 23:30 UTC on 7 October is already 00:30 on 8 October in Sedbergh, whatever the visitor's own time zone.
+  test.beforeEach(async ({ page }) => {
+    await page.clock.setFixedTime(new Date("2026-10-07T23:30:00Z"));
+    await page.goto("/booking");
+  });
+
+  test("today means today in the UK", async ({ page }) => {
+    await fill(page, { ...valid, month: "10", day: "07", year: "2026" });
+    await submit(page);
+    await expectError(page, "Month", "Please pick today or a later date");
+    await fill(page, { day: "08", hour: "12", minute: "15" });
+    await expectError(page, "Hour", "Please pick a time later today");
+    await fill(page, { minute: "45" });
+    await expect(field(page, "Hour")).not.toHaveAttribute("aria-invalid", "true");
+  });
 });
 
 const invalidTimes: { values: Partial<Booking>; focus: string }[] = [
@@ -167,7 +197,7 @@ test("a valid booking shows an honest demo confirmation and sends nothing", asyn
   await expect(heading).toBeFocused();
   const confirmation = page.getByRole("region", { name: "Demo booking checked" });
   await expect(confirmation).toContainText("Thanks, Ada Lovelace.");
-  await expect(confirmation).toContainText("5 people on Thursday, 15 October 2026 at 07:30 AM");
+  await expect(confirmation).toContainText("5 people on Thursday 15 October 2026 at 07:30 AM");
   await expect(confirmation).toContainText("nothing was sent and no table is reserved");
   expect(requests).toEqual([]);
   await expect(page).toHaveURL(/\/booking$/);
@@ -194,7 +224,7 @@ test("the people counter stays between 1 and 20", async ({ page }) => {
   await expect(minus).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(count).toHaveText("1 person");
-  await expect(note).toHaveText("Online bookings are for 1 to 20 people.");
+  await expect(note).toHaveText("Bookings are for 1 to 20 people.");
 
   await plus.click();
   await expect(note).toHaveText("");
@@ -205,7 +235,7 @@ test("the people counter stays between 1 and 20", async ({ page }) => {
   await plus.focus();
   await page.keyboard.press("Space");
   await expect(count).toHaveText("20 people");
-  await expect(note).toHaveText("Online bookings are for 1 to 20 people.");
+  await expect(note).toHaveText("Bookings are for 1 to 20 people.");
 });
 
 test("the AM/PM dropdown works by keyboard as designed", async ({ page }) => {
@@ -233,6 +263,14 @@ test("the AM/PM dropdown works by keyboard as designed", async ({ page }) => {
 
   await page.keyboard.press("a");
   await expect(period).toHaveText("AM");
+
+  // Space opens the list and picks the active option without the button's keyup click reopening it.
+  await page.keyboard.press("Space");
+  await expect(listbox).toBeVisible();
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Space");
+  await expect(period).toHaveText("PM");
+  await expect(listbox).toBeHidden();
 
   // The chevron keeps real padding from the control's right edge.
   const gap = await period.evaluate((button) => {
@@ -269,7 +307,7 @@ test("a booking can be completed with the keyboard alone", async ({ page }) => {
   await page.keyboard.press("Enter");
 
   const confirmation = page.getByRole("region", { name: "Demo booking checked" });
-  await expect(confirmation).toContainText("3 people on Thursday, 15 October 2026 at 08:15 PM");
+  await expect(confirmation).toContainText("3 people on Thursday 15 October 2026 at 08:15 PM");
   await expect(page.getByRole("heading", { name: "Demo booking checked" })).toBeFocused();
 });
 
@@ -278,8 +316,21 @@ test("inputs and the submit button show their designed focus and hover states", 
   await expect(name).toHaveCSS("border-bottom-color", "rgb(142, 142, 142)");
   await name.focus();
   await expect(name).toHaveCSS("border-bottom-color", "rgb(17, 17, 17)");
+  await expect(name).toHaveCSS("box-shadow", /rgb\(17, 17, 17\) 0px -1px 0px 0px inset$/);
+
+  // Invalid fields keep a visible focus underline too.
+  await submit(page);
+  await expect(name).toBeFocused();
+  await expect(name).toHaveCSS("border-bottom-color", "rgb(181, 73, 73)");
+  await expect(name).toHaveCSS("box-shadow", /rgb\(181, 73, 73\) 0px -1px 0px 0px inset$/);
+  const period = page.getByRole("combobox", { name: "AM or PM" });
+  await period.focus();
+  await expect(period).toHaveCSS("box-shadow", /rgb\(181, 73, 73\) 0px -1px 0px 0px inset$/);
+  await expect(period).toHaveAccessibleDescription("This field is incomplete");
 
   const button = page.getByRole("button", { name: "Make reservation" });
+  await page.mouse.move(0, 0);
+  await name.focus();
   await expect(button).toHaveCSS("background-color", "rgb(17, 17, 17)");
   await button.hover();
   await expect(button).toHaveCSS("background-color", "rgb(255, 255, 255)");
@@ -289,10 +340,21 @@ test("inputs and the submit button show their designed focus and hover states", 
 test.describe("without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
 
-  test("the booking page explains that nothing can be sent", async ({ page }) => {
+  test("the booking page explains itself and can never send the details", async ({ page }) => {
+    const sent: string[] = [];
+    page.on("request", (request) => {
+      if (request.method() !== "GET" || request.url().includes("Ada")) sent.push(`${request.method()} ${request.url()}`);
+    });
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Reservations");
     await expect(page.getByText("Booking needs JavaScript to check your details.")).toBeVisible();
-    await expect(page.getByLabel("Name", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Make reservation" })).toBeHidden();
+    await expect(page.locator("form [name]")).toHaveCount(0);
+
+    await fill(page, valid);
+    await field(page, "Email").press("Enter");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Reservations");
+    expect(sent).toEqual([]);
+    expect(page.url()).not.toContain("Ada");
   });
 });
 

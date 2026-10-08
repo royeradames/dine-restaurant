@@ -10,7 +10,7 @@ const toneClasses: Record<Tone, string> = {
 };
 
 export const buttonBaseClasses =
-  "text-button inline-flex h-16 items-center justify-center border px-14 transition-colors duration-200";
+  "text-button inline-flex h-16 items-center justify-center border transition-colors duration-200";
 
 type ButtonLinkProps = {
   href: string;
@@ -21,7 +21,7 @@ type ButtonLinkProps = {
 
 export function ButtonLink({ href, tone, children, className = "" }: ButtonLinkProps) {
   return (
-    <Link href={href} className={`${buttonBaseClasses} ${toneClasses[tone]} ${className}`}>
+    <Link href={href} className={`${buttonBaseClasses} px-14 ${toneClasses[tone]} ${className}`}>
       {children}
     </Link>
   );

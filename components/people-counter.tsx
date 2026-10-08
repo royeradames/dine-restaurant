@@ -22,7 +22,7 @@ export function PeopleCounter({ value, onChange }: PeopleCounterProps) {
   const step = (delta: -1 | 1) => {
     const blocked = delta < 0 ? atMin : atMax;
     if (blocked) {
-      setLimitNote(`Online bookings are for ${PEOPLE_MIN} to ${PEOPLE_MAX} people.`);
+      setLimitNote(`Bookings are for ${PEOPLE_MIN} to ${PEOPLE_MAX} people.`);
       return;
     }
     setLimitNote("");
@@ -57,7 +57,7 @@ export function PeopleCounter({ value, onChange }: PeopleCounterProps) {
           <img src="/images/icons/icon-plus.svg" alt="" width={10} height={11} />
         </button>
       </div>
-      <p id="people-note" aria-live="polite" className="absolute top-full mt-2 text-xs leading-4 font-medium text-tab">
+      <p id="people-note" aria-live="polite" className="absolute top-full mt-1 text-base leading-6 text-tab">
         {limitNote}
       </p>
     </div>

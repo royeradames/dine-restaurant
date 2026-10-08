@@ -26,6 +26,7 @@ SCREENS=1 npx playwright test screens   # review screenshots in ./screenshots
 - Email is required and must be a valid address.
 - Month, day and year are required, must form a real calendar date, and cannot be before today.
 - Hour (1–12) and minute (0–59) are required. A booking for today must be later than the current time.
+- "Today" and "now" use the restaurant's clock (Europe/London), and bookings go up to a year ahead.
 - Party size is 1 to 20 people.
 
 After a failed submit, focus moves to the first invalid field and each message is linked to its field with `aria-describedby`.

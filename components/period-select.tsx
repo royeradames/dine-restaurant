@@ -10,13 +10,14 @@ type PeriodSelectProps = {
   onChange: (value: Period) => void;
   labelledBy: string;
   invalid?: boolean;
+  describedBy?: string;
 };
 
 /**
  * AM/PM picker drawn as designed: an underlined value with a chevron that opens a
  * small white list. Follows the WAI-ARIA select-only combobox pattern.
  */
-export function PeriodSelect({ value, onChange, labelledBy, invalid = false }: PeriodSelectProps) {
+export function PeriodSelect({ value, onChange, labelledBy, invalid = false, describedBy }: PeriodSelectProps) {
   const id = useId();
   const listId = `${id}-list`;
   const [open, setOpen] = useState(false);
@@ -94,11 +95,18 @@ export function PeriodSelect({ value, onChange, labelledBy, invalid = false }: P
         aria-controls={listId}
         aria-activedescendant={open ? `${id}-${periods[activeIndex]}` : undefined}
         aria-invalid={invalid || undefined}
+        aria-describedby={describedBy}
         onClick={() => (open ? setOpen(false) : show())}
         onKeyDown={onKeyDown}
+        // Space is handled on keydown; stop the button's own keyup click from reopening the list.
+        onKeyUp={(event) => {
+          if (event.key === " ") event.preventDefault();
+        }}
         onBlur={() => setOpen(false)}
         className={`text-field flex h-[43px] w-full cursor-pointer items-start gap-4 border-b pr-[15px] pb-[14px] pl-4 text-left text-ink caret-beige transition-[border-color,box-shadow] focus-visible:outline-none ${
-          invalid ? "border-error" : "border-rule focus:border-ink focus:shadow-[inset_0_-1px_0_var(--color-ink)]"
+          invalid
+            ? "border-error focus:shadow-[inset_0_-1px_0_var(--color-error)]"
+            : "border-rule focus:border-ink focus:shadow-[inset_0_-1px_0_var(--color-ink)]"
         }`}
       >
         <span className="w-[34px]">{value}</span>

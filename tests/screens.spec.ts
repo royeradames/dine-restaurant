@@ -1,5 +1,5 @@
 import type { Page } from "@playwright/test";
-import { test } from "./fixtures";
+import { FIXED_NOW, test } from "./fixtures";
 
 // Review captures for design comparison: SCREENS=1 npx playwright test screens
 test.skip(!process.env.SCREENS, "set SCREENS=1 to capture review screenshots");
@@ -21,6 +21,7 @@ async function settleImages(page: Page) {
 for (const width of widths) {
   test(`capture pages at ${width}px`, async ({ page }) => {
     test.setTimeout(120_000);
+    await page.clock.setFixedTime(FIXED_NOW);
     await page.setViewportSize({ width, height: 900 });
     for (const [path, name] of [["/", "home"], ["/booking", "booking"]] as const) {
       await page.goto(path);
@@ -40,7 +41,7 @@ for (const width of widths) {
     await page.screenshot({ path: `screenshots/booking-errors-${width}.png`, fullPage: true });
 
     await page.goto("/booking");
-    for (const [label, value] of [["Name", "John Apples"], ["Email", "john@example.com"], ["Month", "10"], ["Day", "15"], ["Year", "2027"], ["Hour", "07"], ["Minute", "30"]]) {
+    for (const [label, value] of [["Name", "John Apples"], ["Email", "john@example.com"], ["Month", "10"], ["Day", "15"], ["Year", "2026"], ["Hour", "07"], ["Minute", "30"]]) {
       await page.getByLabel(label, { exact: true }).fill(value);
     }
     await page.getByRole("button", { name: "Make reservation" }).click();
