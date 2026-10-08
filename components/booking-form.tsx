@@ -29,7 +29,7 @@ const textInputClasses = (invalid: boolean) =>
 
 const partInputClasses = (invalid: boolean) => `text-field h-[43px] pb-[14px] pl-4 ${underlineClasses(invalid)}`;
 
-const errorClasses = "text-xs leading-3 font-medium tracking-[-0.0125rem] text-error";
+const errorClasses = "text-base leading-5 font-medium tracking-[-0.0125rem] text-error";
 
 const onlyDigits = (value: string) => value.replace(/\D/g, "");
 
@@ -125,7 +125,7 @@ export function BookingForm() {
 
       <form.Field name="name">
         {(field) => (
-          <div className="relative">
+          <div>
             <label htmlFor="booking-name" className="sr-only">
               Name
             </label>
@@ -144,7 +144,7 @@ export function BookingForm() {
               className={textInputClasses(Boolean(errors.name))}
             />
             {errors.name && (
-              <p id="booking-name-error" className={`absolute top-full left-4 mt-3 ${errorClasses}`}>
+              <p id="booking-name-error" className={`mt-3 pl-4 ${errorClasses}`}>
                 {errors.name}
               </p>
             )}
@@ -154,7 +154,7 @@ export function BookingForm() {
 
       <form.Field name="email">
         {(field) => (
-          <div className="relative mt-8 md:mt-[33px]">
+          <div className="mt-8 md:mt-[33px]">
             <label htmlFor="booking-email" className="sr-only">
               Email
             </label>
@@ -173,7 +173,7 @@ export function BookingForm() {
               className={textInputClasses(Boolean(errors.email))}
             />
             {errors.email && (
-              <p id="booking-email-error" className={`absolute top-full left-4 mt-3 ${errorClasses}`}>
+              <p id="booking-email-error" className={`mt-3 pl-4 ${errorClasses}`}>
                 {errors.email}
               </p>
             )}
@@ -184,25 +184,25 @@ export function BookingForm() {
       <div
         role="group"
         aria-labelledby="date-label"
-        className="relative mt-8 md:mt-[34px] md:grid md:grid-cols-[139px_80px_80px_97px] md:gap-x-4"
+        className="mt-8 flex flex-col md:mt-[34px] md:grid md:grid-cols-[139px_80px_80px_97px] md:gap-x-4"
       >
-        <div>
+        <div className="contents md:block">
           <p id="date-label" className={`text-field leading-[1.875rem] ${dateError ? "text-error" : "text-ink"}`}>
             Pick a date
           </p>
           {dateError && (
-            <p id="date-error" className={`absolute top-full left-0 mt-3 md:static md:mt-0 ${errorClasses}`}>
+            <p id="date-error" className={`order-last mt-3 md:order-none md:mt-2 ${errorClasses}`}>
               {dateError}
             </p>
           )}
         </div>
         {/* The design marks the whole date row red for any date problem, so every part shares the error. */}
-        <div className="mt-2 flex gap-1 md:contents">
+        <div className="mt-2 flex flex-wrap gap-x-1 gap-y-2 md:contents">
           {(
             [
               { name: "month", label: "Month", placeholder: "MM", maxLength: 2, width: "w-20" },
               { name: "day", label: "Day", placeholder: "DD", maxLength: 2, width: "w-20" },
-              { name: "year", label: "Year", placeholder: "YYYY", maxLength: 4, width: "min-w-0 flex-1 md:w-auto" },
+              { name: "year", label: "Year", placeholder: "YYYY", maxLength: 4, width: "min-w-[5.5rem] flex-1 md:w-auto md:min-w-0" },
             ] as const
           ).map((part) => (
             <form.Field key={part.name} name={part.name}>
@@ -237,19 +237,19 @@ export function BookingForm() {
       <div
         role="group"
         aria-labelledby="time-label"
-        className="relative mt-8 md:mt-[34px] md:grid md:grid-cols-[139px_80px_80px_97px] md:gap-x-4"
+        className="mt-8 flex flex-col md:mt-[34px] md:grid md:grid-cols-[139px_80px_80px_97px] md:gap-x-4"
       >
-        <div>
+        <div className="contents md:block">
           <p id="time-label" className={`text-field leading-[1.875rem] ${timeError ? "text-error" : "text-ink"}`}>
             Pick a time
           </p>
           {timeError && (
-            <p id="time-error" className={`absolute top-full left-0 mt-3 md:static md:mt-0 ${errorClasses}`}>
+            <p id="time-error" className={`order-last mt-3 md:order-none md:mt-2 ${errorClasses}`}>
               {timeError}
             </p>
           )}
         </div>
-        <div className="mt-2 flex gap-1 md:contents">
+        <div className="mt-2 flex flex-wrap gap-x-1 gap-y-2 md:contents">
           {(
             [
               { name: "hour", label: "Hour", placeholder: "09" },
@@ -284,7 +284,7 @@ export function BookingForm() {
           ))}
           <form.Field name="period">
             {(field) => (
-              <div className="min-w-0 flex-1 md:w-auto">
+              <div className="min-w-[5.5rem] flex-1 md:w-auto md:min-w-0">
                 <span id="period-label" className="sr-only">
                   AM or PM
                 </span>

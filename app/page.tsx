@@ -5,7 +5,7 @@ import { EventTabs } from "@/components/event-tabs";
 import { Logo } from "@/components/logo";
 import { PatternDivide, PatternLines } from "@/components/patterns";
 import { SiteFooter } from "@/components/site-footer";
-import { baseOpenGraph, SITE_NAME, SITE_SHORT_NAME, SITE_URL } from "@/lib/site";
+import { baseOpenGraph, SITE_NAME } from "@/lib/site";
 
 const homeDescription =
   "Dine is a farmhouse restaurant in Sedbergh, Cumbria, serving a seasonal menu of locally sourced food since 1989.";
@@ -18,14 +18,6 @@ export const metadata: Metadata = {
     description: homeDescription,
     url: "/",
   },
-};
-
-const websiteJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: SITE_NAME,
-  alternateName: SITE_SHORT_NAME,
-  url: SITE_URL,
 };
 
 const heroPhoto = photo("hero-bg", { mobile: [375, 748], tablet: [768, 992], desktop: [1440, 820] });
@@ -59,11 +51,6 @@ const sectionHeadingClasses = "text-section-title mt-8 md:mt-10 lg:mt-12";
 export default function HomePage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        // Static, trusted object; escape "<" so the JSON can never close the script tag.
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd).replace(/</g, "\\u003c") }}
-      />
       <header className="relative isolate bg-ink px-6 pt-[232px] pb-[154px] text-center text-white md:px-10 md:pt-[374px] md:pb-[210px] lg:px-0 lg:pt-[65px] lg:pb-[198px] lg:text-left">
         <ArtPicture sources={heroPhoto} alt="" priority className="absolute inset-0 -z-10" />
         {/* The design keeps the text column on plain black; the photo starts beside it. */}

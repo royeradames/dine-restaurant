@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { League_Spartan } from "next/font/google";
-import { baseOpenGraph, SITE_NAME, SITE_URL } from "@/lib/site";
+import { baseOpenGraph, SITE_NAME, SITE_URL, websiteJsonLd } from "@/lib/site";
 import "./globals.css";
 
 const leagueSpartan = League_Spartan({
@@ -33,7 +33,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {/* Marks the page as scripted before first paint, so no-JavaScript notes never flash. */}
         <script dangerouslySetInnerHTML={{ __html: 'document.documentElement.classList.add("js")' }} />
       </head>
-      <body>{children}</body>
+      <body>
+        <script
+          type="application/ld+json"
+          // Static, trusted object; escape "<" so the JSON can never close the script tag.
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd).replace(/</g, "\\u003c") }}
+        />
+        {children}
+      </body>
     </html>
   );
 }
