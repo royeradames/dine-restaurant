@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { League_Spartan } from "next/font/google";
+import { baseOpenGraph, SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const leagueSpartan = League_Spartan({
@@ -10,13 +11,15 @@ const leagueSpartan = League_Spartan({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Dine restaurant | Exquisite dining since 1989",
-    template: "%s | Dine restaurant",
+    default: `${SITE_NAME} | Exquisite dining since 1989`,
+    template: `%s | ${SITE_NAME}`,
   },
   description:
     "Dine is a farmhouse restaurant in Sedbergh, Cumbria, serving a seasonal menu of locally sourced food since 1989.",
-  applicationName: "Dine restaurant",
+  applicationName: SITE_NAME,
+  openGraph: baseOpenGraph,
 };
 
 export const viewport: Viewport = {

@@ -1,9 +1,32 @@
+import type { Metadata } from "next";
 import { ArtPicture, photo } from "@/components/art-picture";
 import { ButtonLink } from "@/components/button-link";
 import { EventTabs } from "@/components/event-tabs";
 import { Logo } from "@/components/logo";
 import { PatternDivide, PatternLines } from "@/components/patterns";
 import { SiteFooter } from "@/components/site-footer";
+import { baseOpenGraph, SITE_NAME, SITE_SHORT_NAME, SITE_URL } from "@/lib/site";
+
+const homeDescription =
+  "Dine is a farmhouse restaurant in Sedbergh, Cumbria, serving a seasonal menu of locally sourced food since 1989.";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+  openGraph: {
+    ...baseOpenGraph,
+    title: `${SITE_NAME} | Exquisite dining since 1989`,
+    description: homeDescription,
+    url: "/",
+  },
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE_NAME,
+  alternateName: SITE_SHORT_NAME,
+  url: SITE_URL,
+};
 
 const heroPhoto = photo("hero-bg", { mobile: [375, 748], tablet: [768, 992], desktop: [1440, 820] });
 const enjoyablePhoto = photo("enjoyable-place", { mobile: [327, 400], tablet: [573, 360], desktop: [540, 720] });
@@ -36,12 +59,17 @@ const sectionHeadingClasses = "text-section-title mt-8 md:mt-10 lg:mt-12";
 export default function HomePage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        // Static, trusted object; escape "<" so the JSON can never close the script tag.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd).replace(/</g, "\\u003c") }}
+      />
       <header className="relative isolate bg-ink px-6 pt-[232px] pb-[154px] text-center text-white md:px-10 md:pt-[374px] md:pb-[210px] lg:px-0 lg:pt-[65px] lg:pb-[198px] lg:text-left">
         <ArtPicture sources={heroPhoto} alt="" priority className="absolute inset-0 -z-10" />
         {/* The design keeps the text column on plain black; the photo starts beside it. */}
         <div aria-hidden="true" className="absolute inset-y-0 left-0 -z-10 hidden w-[calc(50%-175px)] bg-ink lg:block" />
         <div className="mx-auto max-w-[689px] lg:max-w-[1110px]">
-          <Logo title="Dine" className="mx-auto h-8 w-[82px] md:h-10 md:w-[103px] lg:mx-0" />
+          <Logo title={SITE_NAME} className="mx-auto h-8 w-[82px] md:h-10 md:w-[103px] lg:mx-0" />
           <div className="mt-10 lg:mt-[153px]">
             <h1 className="text-hero lg:max-w-[540px] lg:text-[5rem] lg:leading-[5rem] lg:tracking-[-0.0625rem]">
               Exquisite dining <br />

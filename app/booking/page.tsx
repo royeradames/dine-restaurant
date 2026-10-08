@@ -5,11 +5,16 @@ import { BookingForm } from "@/components/booking-form";
 import { Logo } from "@/components/logo";
 import { PatternLines } from "@/components/patterns";
 import { SiteFooter } from "@/components/site-footer";
+import { baseOpenGraph, SITE_NAME } from "@/lib/site";
+
+const bookingDescription =
+  "Request a table at Dine in Sedbergh, Cumbria. Pick a date, time and party size of up to 20 people. This practice site sends nothing.";
 
 export const metadata: Metadata = {
   title: "Reservations",
-  description:
-    "Request a table at Dine in Sedbergh, Cumbria. Pick a date, time and party size of up to 20 people. This practice site sends nothing.",
+  description: bookingDescription,
+  alternates: { canonical: "/booking" },
+  openGraph: { ...baseOpenGraph, title: `Reservations | ${SITE_NAME}`, description: bookingDescription, url: "/booking" },
 };
 
 const headerPhoto = photo("hero-bg", { mobile: [375, 600], tablet: [768, 600], desktop: [1440, 600] }, "booking");
