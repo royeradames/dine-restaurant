@@ -6,8 +6,8 @@ const pages = ["/", "/booking"] as const;
 /** Visible elements that own text, with their computed font size and a short label. */
 const textSizes = (page: Page) =>
   page.evaluate(() => {
-    const smallAllowed = (element: Element) =>
-      Boolean(element.closest("footer, [id$='-error']"));
+    // The family floor is 16px everywhere, including the footer and inline errors (QA, October 8).
+    const smallAllowed = (element: Element) => Boolean(element.closest("[data-sweep-allow-small]"));
     return [...document.querySelectorAll("body *")]
       .filter((element) => {
         if (element.closest("[hidden], noscript, script, style")) return false;

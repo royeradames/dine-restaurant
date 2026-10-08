@@ -96,7 +96,7 @@ html:not(.js) [data-js-only] {
 }
 
 @utility text-footer {
-  font-size: 0.875rem;
+  font-size: 1rem;
   line-height: 1.75rem;
   letter-spacing: 0.125rem;
   text-transform: uppercase;
