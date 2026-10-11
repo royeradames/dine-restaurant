@@ -130,3 +130,33 @@ test("empty-submit errors sit in the flow with room around them at every width",
     expect(clashes, `at ${width}px`).toEqual([]);
   }
 });
+
+/** Labels of visible buttons and button links that break onto more than one line (principle 7, BTN8). */
+const wrappedLabels = (page: Page) =>
+  page.evaluate(() => {
+    const found: string[] = [];
+    for (const control of document.querySelectorAll("button, a.inline-flex")) {
+      if (!control.getClientRects().length || control.closest(".sr-only, [hidden]")) continue;
+      const tops = new Set<number>();
+      const walker = document.createTreeWalker(control, NodeFilter.SHOW_TEXT);
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        if (!node.nodeValue?.trim() || node.parentElement?.closest(".sr-only")) continue;
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        for (const r of range.getClientRects()) if (r.width > 0.5) tops.add(Math.round(r.top));
+      }
+      if (tops.size > 1) found.push(`"${control.textContent?.trim()}" on ${tops.size} lines in a ${Math.round(control.getBoundingClientRect().width)}px box`);
+    }
+    return found;
+  });
+
+// October 11 audit: "Make reservation" wrapped onto two lines from 320 to 330 px. The card gives way, the words don't.
+for (const path of ["/", "/booking"]) {
+  test(`${path} keeps every button label on one line from 320 to 1920 px`, async ({ page }) => {
+    for (const width of [320, 325, 330, 340, 350, 360, 375, 400, 768, 1024, 1440, 1920]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(path);
+      expect(await wrappedLabels(page), `at ${width}px`).toEqual([]);
+    }
+  });
+}
