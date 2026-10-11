@@ -46,7 +46,8 @@ export default function BookingPage() {
             className="absolute top-0 left-0 hidden h-80 w-[calc(50%+273px)] rounded-br-[100px] bg-slate-mist/[0.077] lg:block"
           />
           <PatternLines className="top-[165px] left-[calc(50%-65px)] hidden lg:block" />
-          <div className="relative mx-auto -mt-[137px] max-w-[540px] bg-white px-8 pt-[37px] pb-[35px] shadow-photo md:-mt-[230px] md:px-12 md:pt-[49px] md:pb-[50px] lg:mr-[calc(50%-555px)] lg:-mt-[342px]">
+          {/* Under 360px the card's side padding gives way so "Make reservation" keeps one line (principle 7, BTN8). */}
+          <div className="relative mx-auto -mt-[137px] max-w-[540px] bg-white px-8 max-[22.5rem]:px-5 pt-[37px] pb-[35px] shadow-photo md:-mt-[230px] md:px-12 md:pt-[49px] md:pb-[50px] lg:mr-[calc(50%-555px)] lg:-mt-[342px]">
             <h2 className="sr-only">Reservation details</h2>
             <BookingForm />
           </div>
