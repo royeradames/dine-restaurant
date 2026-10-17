@@ -3,10 +3,7 @@ import { League_Spartan } from "next/font/google";
 import { baseOpenGraph, SITE_NAME, SITE_URL, websiteJsonLd } from "@/lib/site";
 import "./globals.css";
 
-// Fonts aren't preloaded: text paints at once in next/font's size-matched fallback (display: swap), so the
-// font files needn't compete with the first paint.
 const leagueSpartan = League_Spartan({
-  preload: false,
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-league-spartan",
