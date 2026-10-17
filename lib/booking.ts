@@ -1,4 +1,8 @@
-import { z } from "zod";
+import * as z from "zod/mini";
+import en from "zod/v4/locales/en.js";
+
+// Zod Mini ships no messages; load the English ones classic Zod uses so built-in issues read the same.
+z.config(en());
 
 export const bookingMessages = {
   required: "This field is required",
@@ -137,24 +141,26 @@ export function createBookingSchema(now: () => Date = () => new Date()) {
       hour: z.string(),
       minute: z.string(),
       period: z.enum(["AM", "PM"]),
-      people: z.number().int().min(PEOPLE_MIN).max(PEOPLE_MAX),
+      people: z.number().check(z.int(), z.gte(PEOPLE_MIN), z.lte(PEOPLE_MAX)),
     })
-    .superRefine((values, context) => {
-      const report = ({ field, message }: Problem) => context.addIssue({ code: "custom", path: [field], message });
-      const current = now();
+    .check(
+      z.superRefine((values, context) => {
+        const report = ({ field, message }: Problem) => context.addIssue({ code: "custom", path: [field], message });
+        const current = now();
 
-      if (values.name.trim() === "") report({ field: "name", message: bookingMessages.required });
+        if (values.name.trim() === "") report({ field: "name", message: bookingMessages.required });
 
-      const email = values.email.trim();
-      if (email === "") report({ field: "email", message: bookingMessages.required });
-      else if (!emailSchema.safeParse(email).success) report({ field: "email", message: bookingMessages.invalidEmail });
+        const email = values.email.trim();
+        if (email === "") report({ field: "email", message: bookingMessages.required });
+        else if (!emailSchema.safeParse(email).success) report({ field: "email", message: bookingMessages.invalidEmail });
 
-      const dateCheck = checkDate(values, current);
-      if ("problem" in dateCheck) report(dateCheck.problem);
+        const dateCheck = checkDate(values, current);
+        if ("problem" in dateCheck) report(dateCheck.problem);
 
-      const timeProblem = checkTime(values, "date" in dateCheck ? dateCheck.date : undefined, current);
-      if (timeProblem) report(timeProblem);
-    });
+        const timeProblem = checkTime(values, "date" in dateCheck ? dateCheck.date : undefined, current);
+        if (timeProblem) report(timeProblem);
+      }),
+    );
 }
 
 /** First message per field, keyed by field name. Empty when the booking is valid. */
