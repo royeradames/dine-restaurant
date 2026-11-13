@@ -103,7 +103,7 @@ export function PeriodSelect({ value, onChange, labelledBy, invalid = false, des
           if (event.key === " ") event.preventDefault();
         }}
         onBlur={() => setOpen(false)}
-        className={`text-field flex h-[43px] w-full cursor-pointer items-start gap-4 border-b pr-[15px] pb-[14px] pl-4 text-left text-ink caret-beige transition-[border-color,box-shadow] focus-visible:outline-none ${
+        className={`text-field flex h-[43px] w-full cursor-pointer items-start gap-2 border-b pr-3 pb-[14px] pl-4 md:gap-4 md:pr-[15px] text-left text-ink caret-beige transition-[border-color,box-shadow] focus-visible:outline-none ${
           invalid
             ? "border-error focus:shadow-[inset_0_-1px_0_var(--color-error)]"
             : "border-rule focus:border-ink focus:shadow-[inset_0_-1px_0_var(--color-ink)]"

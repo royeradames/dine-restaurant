@@ -72,8 +72,8 @@ export function EventTabs() {
         aria-hidden="true"
         className="absolute top-0 left-0 hidden h-80 w-1/2 rounded-tr-[100px] bg-slate-mist/[0.077] md:block lg:w-[calc(50%-175px)]"
       />
-      <div className="relative mx-auto max-w-[573px] lg:grid lg:max-w-[1110px] lg:grid-cols-[540px_570px] lg:grid-rows-[auto_1fr]">
-        <div className="relative lg:row-span-2">
+      <div className="relative mx-auto max-w-[573px] md:max-w-[689px] lg:grid lg:max-w-[1110px] lg:grid-cols-[540px_570px] lg:grid-rows-[auto_1fr]">
+        <div className="relative md:mx-auto md:max-w-[573px] lg:row-span-2 lg:mx-0 lg:max-w-none">
           {events.map((item, index) => (
             <ArtPicture
               key={item.id}
@@ -88,7 +88,7 @@ export function EventTabs() {
         <div
           role="tablist"
           aria-label="Event types"
-          className="mt-[49px] flex flex-col items-center gap-6 md:mx-[-58px] md:mt-[57px] md:flex-row md:items-start md:gap-[10px] lg:col-start-2 lg:row-start-2 lg:mx-0 lg:mt-20 lg:flex-col lg:items-start lg:gap-6"
+          className="mt-[49px] flex flex-col items-center gap-6 md:mt-[57px] md:flex-row md:items-start md:gap-[10px] lg:col-start-2 lg:row-start-2 lg:mx-0 lg:mt-20 lg:flex-col lg:items-start lg:gap-6"
         >
           {events.map((item, index) => {
             const selected = index === activeIndex;

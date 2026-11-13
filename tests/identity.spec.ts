@@ -31,5 +31,9 @@ test("booking keeps the same site name and its own Open Graph title and URL", as
     "content",
     (await page.locator('meta[name="description"]').getAttribute("content")) ?? "",
   );
-  await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(0);
+  // The QA meta-identity check wants the same WebSite block on every page, not only the home page.
+  const blocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+  expect(blocks.map((text) => JSON.parse(text)).filter((data) => data["@type"] === "WebSite")).toEqual([
+    { "@context": "https://schema.org", "@type": "WebSite", name: SITE_NAME, alternateName: "Dine", url: HOME_URL },
+  ]);
 });

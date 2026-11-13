@@ -6,4 +6,13 @@ export const SITE_SHORT_NAME = "Dine";
 export const SITE_URL = "https://dine-restaurant.royeradames.com";
 
 /** Next replaces (not merges) a parent's openGraph, so every page spreads this in. */
+/** WebSite JSON-LD, emitted by the root layout so every page declares the same site. */
+export const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE_NAME,
+  alternateName: SITE_SHORT_NAME,
+  url: SITE_URL,
+} as const;
+
 export const baseOpenGraph = { siteName: SITE_NAME, type: "website", locale: "en_GB" } as const;
